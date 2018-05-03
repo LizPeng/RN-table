@@ -13,6 +13,7 @@ import {
 const scrollWidth = 1000
 const {width, height} = Dimensions.get('window')
 const AniFlat = Animated.createAnimatedComponent(FlatList)
+//将要从props获取的数据
 const colnameList = ['油品分类', '油品分类', '油库', '油品分类', '油品分类']
 const flatData = [[21.8,17.57,-0.6,"81%"],[10.8,9.43,0.43,"87%"],[5.55,4.12,-0.5,"74%"],[3.7,2.88,-0.2,"78%"],[0.7,0.72,0.13,"103%"],[0.6,0.81,0.31,"135%"],[0.25,0.1,-0.11,"40%"],[0,0,0,"0%"],[11,7.53,-1.64,"69%"],[0,0,0,"0%"],[11,7.53,-1.64,"69%"],[0,0,0,"0%"],[0,0.61,0.61,"0%"]]
 const columnItems = ['计划', '完成', '超欠', '完成率']
@@ -26,19 +27,35 @@ let rowItems =['合计', '汽油', '92#高清', '92#组分', '95#高清', '95#�
 
 // 定义基础尺寸
 const 
-  trheadWidth = 100, // 表格行第一列宽
-  thHeight = 60,     // 表格头部 高度
+  trheadWidth = 110, // 表格行第一列宽
+  thHeight = 40,     // 表格头部 高度
   trHeight = 35,     // 表格行高
   // 数据单元格宽度，小于三列的不滑动
   minTDWidth = (width - trheadWidth) / columnItems.length ,//定义td最小宽度，占满整个屏幕宽度!!!!!!
   tdWidth = minTDWidth > 100 ? minTDWidth : 100,     // 表格行宽
   rightWidth = tdWidth * columnItems.length // !!!!!!
 
+// 定义样式
+const tdBorderWidth = 1
+const tdBorderColor = '#ddd'
+const tdTextColor = '#333'
+const tdBGC = '#fff'
+const thCommonStyle={
+  // width: tdWidth,
+  lineHeight: thHeight,
+  fontWeight: 'bold',
+  color: '#444',
+  backgroundColor: 'rgb(235,235,235)',
+  textAlign: 'center',
+}
+// 定义特殊样式
+
+
 class RightTitle extends Component {
   render() {
     return (
       <View style={newStyle.rightHead}>
-        {columnItems.map( (item, index) => <Text key={index} style={newStyle.rightHeadItem}>{item}</Text> )}
+        {columnItems.map( (item, index) => <View style={newStyle.rightHeadView} key={index}><Text style={{...thCommonStyle}}>{item}</Text></View> )}
       </View>
     )
   }
@@ -47,7 +64,7 @@ class RightTitle extends Component {
 class LeftTitle extends Component {
   render() {
     return (
-      <Text style={newStyle.leftHead}> 'blabla'</Text>
+      <View style={newStyle.leftHeadView}><Text style={{...thCommonStyle}}> 'blabla'</Text></View>
     )
   }
 }
@@ -72,17 +89,17 @@ class App1 extends Component {
 
   _renderDataItem = ({item, index})=>  (
     <View style={newStyle.rightRow}>
-      <Text style={newStyle.rightItemText}>{item[0]}</Text>
-      <Text style={newStyle.rightItemText}>{item[1]}</Text>
-      {item[2] && <Text style={newStyle.rightItemText}>{item[2]}</Text>}
-      {item[3] && <Text style={newStyle.rightItemText}>{item[3]}</Text>}
+      <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[0]}</Text></View>
+      <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[1]}</Text></View>
+      {item[2]!== undefined && <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[2]}</Text></View>}
+      {item[3]!== undefined && <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[3]}</Text></View>}
     </View>
   )
 
   _keyExtractor = (item, index) => index.toString();
 
   _renderLeftItem = ({item}) => (
-    <View style={newStyle.itemView}>
+    <View style={newStyle.leftItemView}>
       <Text style={newStyle.leftItemText}>{item}</Text>
     </View>
   )
@@ -171,60 +188,68 @@ class App1 extends Component {
   }
 }
 
+
 const newStyle = StyleSheet.create({
   tableLeft: {
     width: trheadWidth,
-    height: 500
+    height: 300
   },
   tableRight: {
     width: rightWidth,
-    height: 500,
+    height: 300,
   },
-  itemView: {
+  leftItemView: {
     flex:1,
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomWidth: tdBorderWidth,
+    borderBottomColor: tdBorderColor,
+    borderRightWidth: tdBorderWidth,
+    borderRightColor: tdBorderColor,
   },
   leftItemText: {
     flex:1,
     fontSize: 16,
-    height: trHeight,
+    lineHeight: trHeight,
     fontWeight: 'bold',
     backgroundColor: '#fff'
   },
-  leftHead: {
+  titleText: {
+    ...thCommonStyle, 
+  },
+  leftHeadView: {
     width: trheadWidth,
     height: thHeight,
-    backgroundColor: 'grey',
-    zIndex: 100
+    zIndex: 100,
+    borderRightWidth: tdBorderWidth,
+    borderRightColor: tdBorderColor,
   },
   rightHead: {
-    width: rightWidth,
-    height: thHeight,
+    // width: rightWidth,
+    // height: thHeight,
     flexDirection: 'row',
-    backgroundColor: 'grey',
     zIndex: 10,
   },
-  rightHeadItem: {
-    flex:1,
-    fontSize: 16,
-    color:'#fff',
-    height: thHeight,
-    textAlign: 'right'
+  rightHeadView: {
+    width: tdWidth,
+    lineHeight: thHeight,
+    borderRightWidth: tdBorderWidth,
+    borderRightColor: tdBorderColor,
   },
   rightRow: {
     flex:1,
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderRightWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomWidth: tdBorderWidth,
+    borderBottomColor: tdBorderColor,
+  },
+  rightItemView: {
+    flex:1,
+    borderRightWidth: tdBorderWidth,
+    borderRightColor: tdBorderColor,
   },
   rightItemText: {
-    flex:1,
     fontSize: 16,
-    height: trHeight,
-    backgroundColor: '#fdf',
+    lineHeight: trHeight,
+    backgroundColor: tdBGC,
     textAlign: 'right',
   }
 })
