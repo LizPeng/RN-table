@@ -29,7 +29,7 @@ let rowItems =['合计', '汽油', '92#高清', '92#组分', '95#高清', '95#�
 const 
   trheadWidth = 110, // 表格行第一列宽
   thHeight = 40,     // 表格头部 高度
-  trHeight = 35,     // 表格行高
+  trHeight = 36,     // 表格行高
   // 数据单元格宽度，小于三列的不滑动
   minTDWidth = (width - trheadWidth) / columnItems.length ,//定义td最小宽度，占满整个屏幕宽度!!!!!!
   tdWidth = minTDWidth > 100 ? minTDWidth : 100,     // 表格行宽
@@ -64,7 +64,7 @@ class RightTitle extends Component {
 class LeftTitle extends Component {
   render() {
     return (
-      <View style={newStyle.leftHeadView}><Text style={{...thCommonStyle}}> 'blabla'</Text></View>
+      <View style={newStyle.leftHead}><Text style={{...thCommonStyle}}> 'blabla'</Text></View>
     )
   }
 }
@@ -198,25 +198,10 @@ const newStyle = StyleSheet.create({
     width: rightWidth,
     height: 300,
   },
-  leftItemView: {
-    flex:1,
-    flexDirection: 'row',
-    borderBottomWidth: tdBorderWidth,
-    borderBottomColor: tdBorderColor,
-    borderRightWidth: tdBorderWidth,
-    borderRightColor: tdBorderColor,
-  },
-  leftItemText: {
-    flex:1,
-    fontSize: 16,
-    lineHeight: trHeight,
-    fontWeight: 'bold',
-    backgroundColor: '#fff'
-  },
   titleText: {
     ...thCommonStyle, 
   },
-  leftHeadView: {
+  leftHead: {
     width: trheadWidth,
     height: thHeight,
     zIndex: 100,
@@ -224,13 +209,14 @@ const newStyle = StyleSheet.create({
     borderRightColor: tdBorderColor,
   },
   rightHead: {
-    // width: rightWidth,
-    // height: thHeight,
+    width: rightWidth,
+    height: thHeight,
     flexDirection: 'row',
     zIndex: 10,
   },
   rightHeadView: {
     width: tdWidth,
+    height: thHeight,    
     lineHeight: thHeight,
     borderRightWidth: tdBorderWidth,
     borderRightColor: tdBorderColor,
@@ -238,11 +224,26 @@ const newStyle = StyleSheet.create({
   rightRow: {
     flex:1,
     flexDirection: 'row',
+  },
+  leftItemView: {
+    width: trheadWidth,
+    height: trHeight,
     borderBottomWidth: tdBorderWidth,
     borderBottomColor: tdBorderColor,
+    borderRightWidth: tdBorderWidth,
+    borderRightColor: tdBorderColor,
+  },
+  leftItemText: {
+    fontSize: 16,
+    lineHeight: trHeight,
+    fontWeight: 'bold',
+    backgroundColor: tdBGC,
   },
   rightItemView: {
-    flex:1,
+    width: tdWidth,
+    height: trHeight,
+    borderBottomWidth: tdBorderWidth,
+    borderBottomColor: tdBorderColor,
     borderRightWidth: tdBorderWidth,
     borderRightColor: tdBorderColor,
   },
