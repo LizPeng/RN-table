@@ -13,6 +13,7 @@ import {
 const scrollWidth = 1000
 const {width, height} = Dimensions.get('window')
 const AniFlat = Animated.createAnimatedComponent(FlatList)
+
 //将要从props获取的数据
 const colnameList = ['油品分类', '油品分类', '油库', '油品分类', '油品分类']
 const flatData = [[21.8,17.57,-0.6,"81%"],[10.8,9.43,0.43,"87%"],[5.55,4.12,-0.5,"74%"],[3.7,2.88,-0.2,"78%"],[0.7,0.72,0.13,"103%"],[0.6,0.81,0.31,"135%"],[0.25,0.1,-0.11,"40%"],[0,0,0,"0%"],[11,7.53,-1.64,"69%"],[0,0,0,"0%"],[11,7.53,-1.64,"69%"],[0,0,0,"0%"],[0,0.61,0.61,"0%"]]
@@ -82,32 +83,31 @@ class LeftTitle extends Component {
 const RightRow = (props) => {
   const {item, type = 'rightItemText'} = props
   // 根据type判断style!!!!!!
+  const finalStyle = StyleSheet.flatten([
+    newStyle.rightItemText, textClassStyle[type]
+  ])
   return (
     <View style={newStyle.rightRow}>
-      <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[0]}</Text></View>
-      <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[1]}</Text></View>
-      {item[2]!== undefined && <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[2]}</Text></View>}
-      {item[3]!== undefined && <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[3]}</Text></View>}
+      <View style={newStyle.rightItemView}><Text style={finalStyle}>{item[0]}</Text></View>
+      <View style={newStyle.rightItemView}><Text style={finalStyle}>{item[1]}</Text></View>
+      {item[2]!== undefined && <View style={newStyle.rightItemView}><Text style={finalStyle}>{item[2]}</Text></View>}
+      {item[3]!== undefined && <View style={newStyle.rightItemView}><Text style={finalStyle}>{item[3]}</Text></View>}
     </View>
   )
 }
 const LeftRow = (props) => {
   const {item, type = 'rightItemText'} = props
+  const finalStyle = StyleSheet.flatten([
+    newStyle.leftItemText, textClassStyle[type]
+  ])
   return (
     <View style={newStyle.leftItemView}>
-      <Text style={[newStyle.leftItemText,{...textClassStyle[type]}]}>{item}</Text>
+      <Text style={finalStyle}>{item}</Text>
     </View>
   )
 }
-/**
- * 外部属性props
- * width 
- * height
- * 最后弄data数据格式
- * 内部定义的属性
- * 
- */
-class App1 extends Component {
+
+class Table extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -291,4 +291,4 @@ const newStyle = StyleSheet.create({
     textAlign: 'right',
   },
 })
-export default App1
+export default Table
