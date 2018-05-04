@@ -44,11 +44,20 @@ const thCommonStyle={
   // width: tdWidth,
   lineHeight: thHeight,
   fontWeight: 'bold',
-  color: '#444',
-  backgroundColor: 'rgb(235,235,235)',
+  color: '#7d7d7d',
+  backgroundColor: '#ebebeb',
   textAlign: 'center',
+},
+textClassStyle = {
+  allClass : {
+    color: '#0e6923',
+    backgroundColor: '#f7fff0',
+  },
+  classA : {
+    color: '#9f824b',
+    backgroundColor: '#fcf2de',
+  }
 }
-// 定义特殊样式
 
 
 class RightTitle extends Component {
@@ -69,6 +78,27 @@ class LeftTitle extends Component {
   }
 }
 
+// 右侧数据的渲染
+const RightRow = (props) => {
+  const {item, type = 'rightItemText'} = props
+  // 根据type判断style!!!!!!
+  return (
+    <View style={newStyle.rightRow}>
+      <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[0]}</Text></View>
+      <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[1]}</Text></View>
+      {item[2]!== undefined && <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[2]}</Text></View>}
+      {item[3]!== undefined && <View style={newStyle.rightItemView}><Text style={[newStyle.rightItemText, {...textClassStyle[type]}]}>{item[3]}</Text></View>}
+    </View>
+  )
+}
+const LeftRow = (props) => {
+  const {item, type = 'rightItemText'} = props
+  return (
+    <View style={newStyle.leftItemView}>
+      <Text style={[newStyle.leftItemText,{...textClassStyle[type]}]}>{item}</Text>
+    </View>
+  )
+}
 /**
  * 外部属性props
  * width 
@@ -87,22 +117,30 @@ class App1 extends Component {
     }
   }
 
-  _renderDataItem = ({item, index})=>  (
-    <View style={newStyle.rightRow}>
-      <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[0]}</Text></View>
-      <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[1]}</Text></View>
-      {item[2]!== undefined && <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[2]}</Text></View>}
-      {item[3]!== undefined && <View style={newStyle.rightItemView}><Text style={newStyle.rightItemText}>{item[3]}</Text></View>}
-    </View>
-  )
-
+  _renderDataItem = ({item, index})=>  {
+    // 根据index判断类型->样式 !!!!!!!
+    // 合计、湖北小计-> 绿色 allClass
+    // 汽油、柴油、自有库、租赁库 -> 棕色 classA
+    if(index === 0 ){
+      return  <RightRow item={item} type={'allClass'}/>
+    } else if (index === 1 || index === 8){
+      return  <RightRow item={item} type={'classA'}/>
+    }else {
+      return  <RightRow item={item} />
+    }
+  }
   _keyExtractor = (item, index) => index.toString();
 
-  _renderLeftItem = ({item}) => (
-    <View style={newStyle.leftItemView}>
-      <Text style={newStyle.leftItemText}>{item}</Text>
-    </View>
-  )
+  _renderLeftItem = ({item, index}) => {
+    // 参考_renderDataItem
+    if(index === 0 ){
+      return  <LeftRow item={item} type={'allClass'}/>
+    } else if (index === 1 || index === 8){
+      return  <LeftRow item={item} type={'classA'}/>
+    }else {
+      return  <LeftRow item={item} />
+    }
+  }
   render() {
 
     const {width, height}=  this.props
@@ -163,7 +201,7 @@ class App1 extends Component {
             <RightTitle />
             {/* 右侧list */}
               <Animated.ScrollView
-                contentContainerStyle={{minHeight: 400, backgroundColor: '#3df'}}
+                contentContainerStyle={{minHeight: 400, backgroundColor: tdBGC}}
                 showsVerticalScrollIndicator={false}              
                 onScroll={Animated.event(
                   [{nativeEvent: {contentOffset: {y: this.state.leftY}}}],
@@ -174,7 +212,7 @@ class App1 extends Component {
                 scrollEnabled={this.state.scrollEnable}
               >
                 <AniFlat
-                  style={{transform: [{translateY: rightY}]}}
+                  // style={{transform: [{translateY: rightY}]}}
                   bounces={false}
                   data={flatData}
                   keyExtractor={this._keyExtractor}
@@ -217,7 +255,6 @@ const newStyle = StyleSheet.create({
   rightHeadView: {
     width: tdWidth,
     height: thHeight,    
-    lineHeight: thHeight,
     borderRightWidth: tdBorderWidth,
     borderRightColor: tdBorderColor,
   },
@@ -248,10 +285,10 @@ const newStyle = StyleSheet.create({
     borderRightColor: tdBorderColor,
   },
   rightItemText: {
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: trHeight,
     backgroundColor: tdBGC,
     textAlign: 'right',
-  }
+  },
 })
 export default App1
