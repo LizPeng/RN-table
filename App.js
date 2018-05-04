@@ -9,7 +9,7 @@ import {
   Dimensions,
   Animated
 } from 'react-native';
-  import APP1 from './App1'
+  import Table from './Table'
 
   import AnExScroll from './AnExScroll'
   const scrollWidth = 950
@@ -245,7 +245,7 @@ const App2 = () => {
         <Text style={{height: 50,backgroundColor: 'red'}}>'lorem'</Text> 
       </View>
       <View style={{width:width, height: 500, marginTop: 10,borderBottomWidth:1, borderBottomColor:'#ab4'}}>
-        <APP1/>
+        <Table/>
       </View>
     </View>
   )
