@@ -1,12 +1,44 @@
 // 配置请参考https://github.com/ant-design/ant-design-mobile/issues/654
 import React, { Component } from 'react';
-import { Text, View, Image, StyleSheet, Dimensions, FlatList, SectionList, TouchableWithoutFeedback} from 'react-native';
-import { DatePicker, List, SegmentedControl, Button, Tag, Drawer, Picker, Checkbox} from 'antd-mobile';
+import { Text, View, Image, StyleSheet, Dimensions, FlatList, SectionList, TouchableWithoutFeedback, TextInput, Keyboard} from 'react-native';
+import { DatePicker, List, SegmentedControl, Button, Tag, Drawer, Picker, Checkbox, SearchBar} from 'antd-mobile';
 import orgInfo from './data/org'
 
 const CheckboxItem = Checkbox.CheckboxItem,
   checkboxHeight = 40,
   headItemHeight = 40
+
+const 
+  // 所有加油站
+  allGasStation = orgInfo.children.map( d => {
+    const result = {}
+    result.sectionName = d.orgNm
+    result.key = d.orgNo
+    result.data=[]
+    d.children.map(child => {
+      result.data.push({
+        orgNm: child.orgNm,
+        key: child.orgNo
+      })
+    })
+    return result
+  }),
+  // 所有分公司
+  allSubsidiary = orgInfo.children.map( d => {
+      const temp = Object.assign({}, d,{key: d.orgNo})
+      delete temp.children
+      return temp
+  }),
+  searchData = {}
+  allGasStation.map( d=> {
+    searchData[d.key] = d.data
+  })
+
+// 计算滚动高度
+const positionData = {}
+orgInfo.children.map( d => {
+  positionData[d.orgNo] = headItemHeight + checkboxHeight * d.children.length 
+})
 const { width, height} = Dimensions.get('window')
 const zhibiaoData = [
     {
@@ -51,7 +83,11 @@ const initialState = {
   wd:0,
   mom:false,
   yoy:false,
-  checkedData:{}
+  checkedData:{},
+  showSubsidiary: true,
+  selectAllSubsidiary: false,
+  searchInput: '',
+  searhResult: [...allGasStation],
 };
 export default class App extends React.Component {
   
@@ -92,8 +128,50 @@ export default class App extends React.Component {
       [d]: !this.state[d]
     })
   }
-
+  _onSearchChange =(e) => {
+    this.setState({
+      searchInput: e
+    })
+  }
+  _selectAllSub =() => {
+    const temp = {...this.state.checkedData},
+      current = this.state.selectAllSubsidiary
+      console.log(current)
+    allSubsidiary.map(d => {
+      Object.assign(temp, {
+        [d.orgNo]: !current
+      })
+    })
+    console.log(temp)
+    this.setState({ 
+      checkedData: temp,
+      selectAllSubsidiary: !current
+     })
+  }
+  _searchResult = (input) => {
+    const temp = [...allGasStation]
+    const result = []
+    temp.map( d => {
+      const data = []
+      d.data.map( dd => {
+         if(dd.orgNm.includes(input)) {
+           data.push(dd)
+         }
+      })
+      const final = {
+        sectionName: d.sectionName,
+        key: d.key,
+        data: data
+      }
+      return data.length !== 0 ? result.push(final) : null
+    })
+    console.log('searchResult: ' ,result)
+    // this.setState({
+    //   searhResult: result
+    // })
+  }
   render() {
+    console.log(this.state.searchInput)
     const segment = (
       <SegmentedControl
         style={{width: '50%'}}
@@ -119,7 +197,6 @@ export default class App extends React.Component {
         checkedData: temp
        })
     }
-    console.log('state:',this.state.checkedData)
     const renderSideItem = ({item, index}) => (
       <CheckboxItem 
         key={index}
@@ -129,32 +206,7 @@ export default class App extends React.Component {
       <Text>{item.orgNm}</Text>
       </CheckboxItem>
     )
-    const 
-      // 所有加油站
-      allGasStation = orgInfo.children.map( d => {
-        const result = {}
-        result.sectionName = d.orgNm
-        result.key = d.orgNo
-        result.data=[]
-        d.children.map(child => {
-          result.data.push({
-            orgNm: child.orgNm,
-            key: child.orgNo
-          })
-        })
-        return result
-      }),
-      // 所有分公司
-      allSubsidiary = orgInfo.children.map( d => {
-          const temp = Object.assign({}, d)
-          delete temp.children
-          return temp
-      })
-    // 计算滚动高度
-    const positionData = {}
-    orgInfo.children.map( d => {
-      positionData[d.orgNo] = headItemHeight + checkboxHeight * d.children.length 
-    })
+   
     
     const renderListItem = ({item}) => {
       const {orgNm, key} = item
@@ -172,7 +224,7 @@ export default class App extends React.Component {
     }
     const renderHeadItem = ({section}) => {
       const {sectionName, key} = section
-      console.log(sectionName,key)
+      // console.log(sectionName,key)
       return (
           <View 
             style={{width: '100%',height: headItemHeight, backgroundColor: 'rgb(16, 131,230)'}}
@@ -212,29 +264,89 @@ export default class App extends React.Component {
         </TouchableWithoutFeedback>
       )
     }
-    const sidebar = (
-      <View style={{height: height, position:'relative'}}>
-          <FlatList
-            style={{width: 30, backgroundColor: '#fff',paddingBottom: 40, paddingTop: 40,position:'absolute', right: 0,top: 0,zIndex: 10}}
+    console.log('allGasStation:  ', allSubsidiary, allGasStation ,searchData)
+    const gasList = () => (
+      <View style={{paddingRight:30}}>
+        <FlatList
+            style={{width: 30, backgroundColor: '#fff',paddingBottom: 20, paddingTop: 20,position:'absolute', right: 0,top: 0,zIndex: 10}}
             bounces={false}
             keyExtractor={(d,i) => i.toString()}
             data={allSubsidiary}
             renderItem={renderABBR}
-            />
-            <SectionList
-              ref={(ref) => this._list = ref}
-              style={{paddingRight: 30}}
-              bounces={false}
-              renderItem={({item, index}) => renderListItem({item, index})}
-              renderSectionHeader={({section}) => renderHeadItem({section})}
-              sections={allGasStation}
-              getItemLayout={(data, index) => ({
-                index,
-                offset: checkboxHeight * index ,
-                length: checkboxHeight
-                })
-              }
-            />
+          />
+          <SectionList
+            ref={(ref) => this._list = ref}
+            style={{paddingRight: 0}}
+            stickySectionHeadersEnabled={true}
+            bounces={false}
+            renderItem={({item, index}) => renderListItem({item, index})}
+            renderSectionHeader={({section}) => renderHeadItem({section})}
+            sections={allGasStation}
+            getItemLayout={(data, index) => ({
+              index,
+              offset: checkboxHeight * index ,
+              length: checkboxHeight
+              })
+            }
+          />
+        </View>
+    )
+    const subList = () => (
+        <FlatList
+            style={{flex: 1}}
+            bounces={false}
+            keyExtractor={(d,i) => i.toString()}
+            data={allSubsidiary}
+            renderItem={renderListItem}
+        />
+     )
+    const searchView = () => (
+      <View style={{flexDirection: 'row', height: 30, }}>
+          <TextInput
+              style={{flex:1, backgroundColor:'#bbb',padding:5,marginRight: 10,}}
+              placeholder="请输入搜索内容"
+              onBlur={() => Keyboard.dismiss()}
+              onChangeText={(text) => this._onSearchChange(text)}
+          />
+          <Button
+            inline
+            type='primary'
+            style={{width: 90,height: 30,}}
+            onClick={this._searchResult(this.state.searchInput)}
+          >
+          搜索
+          </Button>
+      </View>
+    )
+    const sidebar = (
+      // -20 减去上边距!!!!
+      <View style={{height: height - 20}}>
+        <View style={{backgroundColor: '#fff'}}>
+          {
+            this.state.showSubsidiary 
+            ? null
+            : searchView()
+          }
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', height:40, backgroundColor: '#fff'}}>
+            <Button inline type='primary' style={{marginLeft: 10, marginTop: 10, width: 140,height:28}}
+              onClick={() => this._selectAllSub()}
+            >
+              { this.state.selectAllSubsidiary ? '分公司全不选': '分公司全选'}
+            </Button>
+            <Button inline type='primary' style={{marginLeft: 10, marginTop: 10, width: 90,height:28}} 
+              onClick={() => this.setState({showSubsidiary: !this.state.showSubsidiary})}>
+              {this.state.showSubsidiary ? '加油站' : '分公司'}
+            </Button>
+          </View>
+        </View>
+        <View style={{flex: 1}}>
+          {
+            this.state.showSubsidiary 
+            ? subList()
+            : gasList()
+          }
+        </View>
+        
       </View>
     );
 

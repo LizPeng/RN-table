@@ -11,6 +11,7 @@
     "dva-core": "^1.2.1",
     "react": "16.3.1",
     "react-native": "0.55.4",
+    "react-native-sectioned-multi-select": "^0.4.7",
     "react-navigation": "^2.0.1",
     "react-navigation-redux-helpers": "^1.0.6",
     "react-redux": "^5.0.7"
